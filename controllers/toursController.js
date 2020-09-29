@@ -14,9 +14,18 @@ exports.checkID = (req, res, next, id) => {
   next();
 };
 
-exports.getAllTours = (req, res) => {
-  console.log(tours);
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Name must be included in the body'
+    });
+  }
 
+  next();
+};
+
+exports.getAllTours = (req, res) => {
   return res.status(200).json({
     status: 'success',
     data: {
@@ -35,4 +44,23 @@ exports.getOneTour = (req, res) => {
       tour
     }
   });
+};
+
+exports.postATour = (req, res) => {
+  const id = tours.length;
+  const data = req.body;
+  const newTour = { id, ...data };
+  tours.push(newTour);
+  fs.writeFile(
+    `${__dirname}/../dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    err => {
+      res.status(200).json({
+        status: 'success',
+        data: {
+          tours
+        }
+      });
+    }
+  );
 };
