@@ -1,43 +1,22 @@
-const fs = require('fs');
+const Tour = require('../models/toursModel');
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
-
-exports.checkID = (req, res, next, id) => {
-  if (id * 1 > tours.length - 1) {
-    return res.status(400).json({
+exports.getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find();
+    return res.status(200).json({
+      status: 'success',
+      data: { tours }
+    });
+  } catch (err) {
+    res.status(500).json({
       status: 'fail',
-      message: 'Tours not exist'
+      message: err
     });
   }
-  next();
-};
-
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Name must be included in the body'
-    });
-  }
-
-  next();
-};
-
-exports.getAllTours = (req, res) => {
-  return res.status(200).json({
-    status: 'success',
-    data: {
-      tours
-    }
-  });
 };
 
 exports.getOneTour = (req, res) => {
-  const id = req.params.id * 1;
-
-  const tour = tours.find(item => item.id === id);
+  const tour = Tour.findById(req.params.id);
   return res.status(200).json({
     status: 'success',
     data: {
@@ -46,21 +25,93 @@ exports.getOneTour = (req, res) => {
   });
 };
 
-exports.postATour = (req, res) => {
-  const id = tours.length;
-  const data = req.body;
-  const newTour = { id, ...data };
-  tours.push(newTour);
-  fs.writeFile(
-    `${__dirname}/../dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    err => {
-      res.status(200).json({
-        status: 'success',
-        data: {
-          tours
-        }
-      });
+exports.deleteOneTour = (req, res) => {
+  const tour = Tour.findOneAndDelete(req.params.id);
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      tour
     }
-  );
+  });
 };
+
+exports.postATour = async (req, res) => {
+  const tour = await Tour.create(req.body);
+  // const id = tours.length;
+  // const data = req.body;
+  // const newTour = { id, ...data };
+  res.status(200).json({
+    status: 'Success',
+    data: {
+      tour
+    }
+  });
+};
+
+exports.updateATour = async (req, res) => {
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+    new: true
+  });
+  // const id = tours.length;
+  // const data = req.body;
+  // const newTour = { id, ...data };
+  res.status(200).json({
+    status: 'Success',
+    data: {
+      tour
+    }
+  });
+};
+
+exports.updateTourContent = async (req, res) => {
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+    new: true
+  });
+  // const id = tours.length;
+  // const data = req.body;
+  // const newTour = { id, ...data };
+  res.status(200).json({
+    status: 'Success',
+    data: {
+      tour
+    }
+  });
+};
+
+// const tours = JSON.parse(
+//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+// );
+
+// exports.checkID = (req, res, next, id) => {
+//   if (id * 1 > tours.length - 1) {
+//     return res.status(400).json({
+//       status: 'fail',
+//       message: 'Tours not exist'
+//     });
+//   }
+//   next();
+// };
+
+// exports.checkBody = (req, res, next) => {
+//   if (!req.body.name) {
+//     return res.status(400).json({
+//       status: 'fail',
+//       message: 'Name must be included in the body'
+//     });
+//   }
+
+//   next();
+// };
+
+// fs.writeFile(
+//   `${__dirname}/../dev-data/data/tours-simple.json`,
+//   JSON.stringify(tours),
+//   err => {
+//     res.status(200).json({
+//       status: 'success',
+//       data: {
+//         tours
+//       }
+//     });
+//   }
+// );
