@@ -10,13 +10,12 @@ const TourSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Tour Price is required']
   },
-  type: {
-    type: String,
+  duration: {
+    type: Number,
     required: true
   },
   address: {
-    type: String,
-    required: true
+    type: String
   },
   ratingsAverage: {
     type: Number,
